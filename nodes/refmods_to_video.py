@@ -187,9 +187,12 @@ def _native_references(references, video_vae, audio_vae, width, height, length, 
                 audios[f"ref_audio_{index}"] = entry["data"]
             names.append(name)
     presentation = _ReferencePresentation()
+    # Keyword arguments only: core ComfyUI changed the positional order of execute()
+    # (clip, vae, audio_vae, prompt, ...), so a positional call breaks across versions.
     output = MiniMaxH3ReferenceToVideo.execute(
-        presentation, "", width, height, length, ref_image_size=ref_image_size,
-        vae=video_vae, audio_vae=audio_vae, ref_images=images, ref_videos=videos,
+        clip=presentation, prompt="", width=width, height=height, length=length,
+        ref_image_size=ref_image_size, vae=video_vae, audio_vae=audio_vae,
+        ref_images=images, ref_videos=videos,
         ref_video_audios=soundtracks, ref_audios=audios)
     conditioning, latent = output.result
     return presentation.items, list(conditioning[0][1].get("minimax_refs", [])), names, latent
